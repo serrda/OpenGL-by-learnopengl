@@ -1,2 +1,3 @@
-﻿  Application.cpp
+﻿  Shader.cpp
+c:\users\serdardzhemilyev\documents\visual studio 2017\projects\opengl by learnopengl\opengl by learnopengl\source\shader.cpp(1): warning C4067: unexpected tokens following preprocessor directive - expected a newline
   OpenGL by learnopengl.vcxproj -> C:\Users\serdardzhemilyev\Documents\Visual Studio 2017\Projects\OpenGL by learnopengl\Debug\OpenGL by learnopengl.exe
