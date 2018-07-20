@@ -1,4 +1,4 @@
-#include "Shader.h";
+#include "Shader.h"
 #include <iostream>
 
 Shader::Shader(const GLchar * vertexPath, const GLchar * fragmentPath)
@@ -94,7 +94,7 @@ Shader::Shader(const GLchar * vertexPath, const GLchar * fragmentPath)
 	glDeleteShader(fragment);
 }
 
-void Shader::use()
+void Shader::use() 
 {
 	glUseProgram(ID);
 }
