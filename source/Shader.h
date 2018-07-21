@@ -7,6 +7,9 @@
 #include <sstream>
 #include <iostream>
 
+#include "glm/glm.hpp"
+#include "glm/gtc/matrix_transform.hpp"
+#include "glm/gtc/type_ptr.hpp"
 
 class Shader
 {
@@ -26,4 +29,8 @@ public:
 	void setUniform1f(const std::string &name, float value) const;
 	void setUniform3f(const std::string &name, float value0, float value1, float value2) const;
 	void setUniform4f(const std::string &name, float value0, float value1, float value2, float value3) const;
+	void setUniformMatrix4fv(const std::string &name, glm::mat4 _matrix) const;
+
+
+	unsigned int GetID() const { return ID; }
 };
