@@ -5,7 +5,7 @@
 
 void Renderer::Clear() const
 {
-	glClearColor(0.2f, 0.3f, 0.3f, 1.0f);				// Sets a color to clear screen with. Function is a state-setting function
+	glClearColor(0.2f, 0.2f, 0.2f, 1.0f);				// Sets a color to clear screen with. Function is a state-setting function
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	// Actually clears the screen. Function is a state using function.
 }
 void Renderer::Draw(const VertexArray & _va, const ElementBuffer & _eb, Shader & _shader) const
