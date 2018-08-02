@@ -4,8 +4,6 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include "stb_image/stb_image.h"
-#include "imgui/imgui.h"
-#include "imgui/imgui_impl_glfw_gl3.h"
 
 #include "Shader.h"
 #include "VertexBuffer.h"
@@ -38,6 +36,8 @@ bool firstMouse = true;
 // Timing
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
+
+glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
 
 int main()
 {
@@ -132,14 +132,12 @@ int main()
 
 	glm::vec3 cubePositions[] = {
 		glm::vec3(-1.5f, -2.2f, -2.5f),
-		glm::vec3( 1.5f,  2.0f, -2.5f)
 	};
 
-	glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
 	
 	VertexArray va;
-	VertexArray lightVAO;
 	VertexBuffer vb(vertices, sizeof(vertices));						
+	VertexArray lightVAO;
 	VertexBuffer lightVBO(vertices, sizeof(lightPos));	
 	
 	VertexBufferLayout layout;
@@ -149,23 +147,7 @@ int main()
 	va.AddBuffer(vb, layout);
 	lightVAO.AddBuffer(lightVBO, layout);
 
-
-	glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
-	glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
-	glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
-
-	// colors
-	glm::vec3 lightColor(1.0f, 1.0f, 1.0f);
-	glm::vec3 toyColor(1.0f, 0.5f, 0.31f);
-	glm::vec3 result = lightColor * toyColor;
-
 	Renderer engine;
-
-	lightShader.setUniform3fv("lightPos", lightPos);
-
-	ImGui::CreateContext();
-	ImGui_ImplGlfwGL3_Init(window, true);
-	ImGui::StyleColorsDark();
 	
 	while (!glfwWindowShouldClose(window))
 	{
@@ -176,13 +158,28 @@ int main()
 		processInput(window);
 		
 		engine.Clear();
-		ImGui_ImplGlfwGL3_NewFrame();
 
 		engine.Draw(va, shader);
 
 		shader.use();
-		shader.setUniform3f("objectColor", 1.0f, 0.5f, 0.31f);
-		shader.setUniform3f("lightColor", 1.0f, 1.0f, 1.0f);
+		shader.setUniform3f("light.position", lightPos);
+		shader.setUniform3f("viewPos", camera.Position);
+
+		glm::vec3 lightColor;
+		lightColor.x = sin((float)glfwGetTime() * 2.0f);
+		lightColor.y = sin((float)glfwGetTime() * 0.7f);
+		lightColor.z = sin((float)glfwGetTime() * 1.3f);
+		glm::vec3 diffuseColor = lightColor * glm::vec3(0.5f);
+		glm::vec3 ambientColor = diffuseColor * glm::vec3(0.2f);
+		shader.setUniform3f("light.ambient", ambientColor);
+		shader.setUniform3f("light.diffuse", diffuseColor);
+		shader.setUniform3f("light.specular", glm::vec3(1.0f, 1.0f, 1.0f));
+
+		shader.setUniform3f("material.ambient", glm::vec3(1.0f, 0.5f, 0.31f));
+		shader.setUniform3f("material.diffuse", glm::vec3(1.0f, 0.5f, 0.31f));
+		shader.setUniform3f("material.specular", glm::vec3(0.5f, 0.5f, 0.5f));
+		shader.setUniform1f("material.shininess", 32.0f);
+		
 
 		glm::mat4 projection;
 		projection = glm::perspective(glm::radians(camera.Zoom), (float)(SCR_WIDTH / SCR_HEIGHT), 0.1f, 100.0f);
@@ -191,34 +188,28 @@ int main()
 		shader.setUniformMatrix4fv("projection", projection);
 		shader.setUniformMatrix4fv("view", view);
 
-		for (unsigned int i = 0; i < 2; i++)
-		{
-			glm::mat4 model;
-			model = glm::translate(model, cubePositions[i]);
-			float angle = 20.0f * i;
-			model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
-			shader.setUniformMatrix4fv("model", model);
-			glDrawArrays(GL_TRIANGLES, 0, 36);
-		}
+		glm::mat4 model;
+		shader.setUniformMatrix4fv("model", model);
+		va.Bind();
 
 		lightShader.use();
 		lightShader.setUniformMatrix4fv("projection", projection);
 		lightShader.setUniformMatrix4fv("view", view);
-		glm::mat4 model;
-		model = glm::translate(model, lightPos);
-		model = glm::scale(model, glm::vec3(0.2f));
-		lightShader.setUniformMatrix4fv("model", model);
+		glm::mat4 lightModel;
+		lightModel = glm::translate(lightModel, lightPos);
+		lightModel = glm::scale(lightModel, glm::vec3(0.2f));
+		lightShader.setUniformMatrix4fv("model", lightModel);
 		glDrawArrays(GL_TRIANGLES, 0, 36);
 
+		
 
-		ImGui::Render();
-		ImGui_ImplGlfwGL3_RenderDrawData(ImGui::GetDrawData());
+
+
+
 
 		glfwSwapBuffers(window); /* Swaps the color buffer(buffer that contains color values for each pixel in GLFW's window) that has been used to draw in during this iteration and show it as output to the screen */
 		glfwPollEvents(); /* Checks if any events are triggered(like keyboard input or mouse movement events), updates window state, and calls corresponding functions(callback methods)*/
 	}
-	ImGui_ImplGlfwGL3_Shutdown();
-	ImGui::DestroyContext();
 	glfwTerminate();
 	return 0;
 }
