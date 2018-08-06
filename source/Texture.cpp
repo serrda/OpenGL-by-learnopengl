@@ -44,7 +44,7 @@ void Texture::SetParams() const
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_REPEAT);
 }
-
+ 
 void Texture::LoadImg(const std::string _path, GLenum _format) const
 {
 	int width, height, nrChannels;
