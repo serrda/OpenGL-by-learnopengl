@@ -25,7 +25,7 @@ void processInput(GLFWwindow *window);
 
 // Settings
 const unsigned int SCR_WIDTH = 800;
-const unsigned int SCR_HEIGHT = 600;
+const unsigned int SCR_HEIGHT = 800;
 
 // Camera
 Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
@@ -173,12 +173,21 @@ int main()
 		engine.Draw(va, shader);
 
 		shader.use();
-		shader.setUniform3f("light.position", lightPos);
+		shader.setUniform3f("light.position", camera.Position);
 		shader.setUniform3f("viewPos", camera.Position);
+		shader.setUniform3f("light.direction", camera.Front);
+		shader.setUniform1f("light.cutoff", glm::cos(glm::radians(9.0f)));
+		shader.setUniform1f("light.outercutoff", glm::cos(glm::radians(12.0f)));
 		
 		shader.setUniform3f("light.ambient", glm::vec3(0.2f, 0.2f, 0.2f));
 		shader.setUniform3f("light.diffuse", glm::vec3(0.5f, 0.5f, 0.5f));
 		shader.setUniform3f("light.specular", glm::vec3(1.0f, 1.0f, 1.0f));
+		shader.setUniform1f("light.constant", 1.0f);
+		shader.setUniform1f("light.linear", 0.09f);
+		shader.setUniform1f("light.quadratic", 0.032f);
+		
+
+
 		
 		shader.setUniform1f("material.shininess", 64.0f);
 		
@@ -198,15 +207,15 @@ int main()
 		specular_box.Bind(1);
 
 
-		lightShader.use();
-		
-		lightShader.setUniformMatrix4fv("projection", projection);
-		lightShader.setUniformMatrix4fv("view", view);
-		glm::mat4 lightModel;
-		lightModel = glm::translate(lightModel, lightPos);
-		lightModel = glm::scale(lightModel, glm::vec3(0.2f));
-		lightShader.setUniformMatrix4fv("model", lightModel);
-		glDrawArrays(GL_TRIANGLES, 0, 36);
+		//lightShader.use();
+		//
+		//lightShader.setUniformMatrix4fv("projection", projection);
+		//lightShader.setUniformMatrix4fv("view", view);
+		//glm::mat4 lightModel;
+		//lightModel = glm::translate(lightModel, lightPos);
+		//lightModel = glm::scale(lightModel, glm::vec3(0.2f));
+		//lightShader.setUniformMatrix4fv("model", lightModel);
+		//glDrawArrays(GL_TRIANGLES, 0, 36);
 
 		
 
